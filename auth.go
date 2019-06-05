@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"strings"
 
+	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
@@ -17,9 +19,12 @@ func validateToken(
 	if !ok {
 		return nil, ErrMissingGRPCAuthData
 	}
-	t := md["authorization"]
-	if len(t) < 1 {
+	auth := md["authorization"]
+	if len(auth) < 1 {
 		return nil, ErrTokenInvalid
 	}
+	token := strings.TrimPrefix(auth[0], "Bearer ")
+	logrus.Debug(token)
+	// TODO: look for token in database and ensure it exists
 	return nil, nil
 }
