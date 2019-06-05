@@ -2,15 +2,15 @@ syntax = "proto3";
 
 package proto;
 
+import "google/protobuf/any.proto";
+
 service IMage {
-  rpc RotateImage(stream RotateImageRequest) returns (stream TransformedImage);
-  rpc BlurImage(stream BlurImageRequest) returns (stream TransformedImage);
-  rpc CropImage(stream CropImageRequest) returns (stream TransformedImage);
+  rpc TransformImage(stream TransformImageRequest) returns (stream TransformedImage);
 }
 
 message Image {
-  string format = 1;
-  int64 size = 2;
+  int64 size = 1;
+  string format = 2;
   bytes file = 3;
 }
 
@@ -18,14 +18,24 @@ message TransformedImage {
   bytes file = 1;
 }
 
+enum TransformationType {
+  ROTATE = 0;
+  CROP = 1;
+  BLUR = 2;
+}
+
+message TransformImageRequest {
+  TransformationType type = 1;
+  google.protobuf.Any data = 2;
+  Image image = 3;
+}
+
 message RotateImageRequest {
   int32 angle = 1;
-  Image image = 2;
 }
 
 message BlurImageRequest {
   float sigma = 1;
-  Image image = 2;
 }
 
 message CropImageRequest {
@@ -33,8 +43,6 @@ message CropImageRequest {
   int32 topLeftY = 2;
   int32 width = 3;
   int32 height = 4;
-
-  Image image = 5;
 }
 
 message NewTokenRequest {

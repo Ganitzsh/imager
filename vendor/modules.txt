@@ -2,11 +2,13 @@
 github.com/armon/go-metrics
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
+# github.com/disintegration/imaging v1.6.0
+github.com/disintegration/imaging
 # github.com/fsnotify/fsnotify v1.4.7
 github.com/fsnotify/fsnotify
 # github.com/golang/protobuf v1.3.1
-github.com/golang/protobuf/proto
 github.com/golang/protobuf/ptypes
+github.com/golang/protobuf/proto
 github.com/golang/protobuf/ptypes/any
 github.com/golang/protobuf/ptypes/duration
 github.com/golang/protobuf/ptypes/timestamp
@@ -62,6 +64,10 @@ github.com/spf13/pflag
 github.com/spf13/viper
 # golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
 golang.org/x/crypto/ssh/terminal
+# golang.org/x/image v0.0.0-20180708004352-c73c2afc3b81
+golang.org/x/image/bmp
+golang.org/x/image/tiff
+golang.org/x/image/tiff/lzw
 # golang.org/x/net v0.0.0-20190522155817-f3200d17e092
 golang.org/x/net/context
 golang.org/x/net/trace
@@ -82,12 +88,12 @@ golang.org/x/text/unicode/bidi
 google.golang.org/genproto/googleapis/rpc/status
 # google.golang.org/grpc v1.21.0
 google.golang.org/grpc
+google.golang.org/grpc/credentials
 google.golang.org/grpc/metadata
 google.golang.org/grpc/balancer
 google.golang.org/grpc/balancer/roundrobin
 google.golang.org/grpc/codes
 google.golang.org/grpc/connectivity
-google.golang.org/grpc/credentials
 google.golang.org/grpc/encoding
 google.golang.org/grpc/encoding/proto
 google.golang.org/grpc/grpclog
@@ -109,8 +115,8 @@ google.golang.org/grpc/resolver/passthrough
 google.golang.org/grpc/stats
 google.golang.org/grpc/status
 google.golang.org/grpc/tap
-google.golang.org/grpc/balancer/base
 google.golang.org/grpc/credentials/internal
+google.golang.org/grpc/balancer/base
 google.golang.org/grpc/binarylog/grpc_binarylog_v1
 google.golang.org/grpc/internal/syscall
 # gopkg.in/yaml.v2 v2.2.2

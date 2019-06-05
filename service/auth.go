@@ -1,8 +1,9 @@
 package service
 
 import (
-	"context"
 	"strings"
+
+	"golang.org/x/net/context"
 
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"

@@ -62,6 +62,9 @@ func init() {
 	rootCmd.PersistentFlags().Int32P(
 		"port", "p", 0, "port on which the server will listen",
 	)
+	rootCmd.PersistentFlags().StringP(
+		"addr", "a", ":8080", "The server's address",
+	)
 }
 
 func initConfig() {
@@ -75,6 +78,7 @@ func initConfig() {
 	viper.SetDefault("DevMode", true)
 	viper.SetDefault("MaxImageSize", 25165824) // Default is 24MB
 	viper.BindPFlag("Port", rootCmd.Flags().Lookup("port"))
+	viper.BindPFlag("Host", rootCmd.Flags().Lookup("addr"))
 	viper.SetConfigFile(flagCfgFile)
 
 	viper.AutomaticEnv()

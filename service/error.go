@@ -41,4 +41,8 @@ var (
 		"file_size_exceeded",
 		"File size exceeds the maximum size difined by the server",
 	)
+	ErrUnsupportedFormat = NewServiceError(
+		"unsupported_format",
+		"Unsupported image format",
+	)
 )

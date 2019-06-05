@@ -9,6 +9,7 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	pb "github.com/ganitzsh/12fact/proto"
+	"github.com/golang/protobuf/ptypes/any"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
@@ -55,47 +56,60 @@ func (s *Server) ListenAndServe() error {
 	return grpcServer.Serve(lis)
 }
 
-func (s *Server) RotateImage(stream pb.IMage_RotateImageServer) error {
+func (s *Server) TransformImage(stream pb.IMage_TransformImageServer) error {
 	var format string
-	var angle int32
+	var any *any.Any
+	var transformationType pb.TransformationType
+	var fileSize int64
 
 	f, e := ioutil.TempFile(os.TempDir(), "12fact")
 	if e != nil {
 		return e
 	}
 	logrus.Debug(f.Name())
-	defer os.Remove(f.Name())
+	defer f.Close()
+	// defer os.Remove(f.Name())
 	for {
 		req, err := stream.Recv()
 		if err == io.EOF {
 			break
 		} else if err != nil {
+			logrus.Error("1 ", err)
 			return err
+		}
+		if req.GetImage().GetSize() > s.MaxImageSize {
+			return ErrFileSizeExceeded
+		}
+		if fileSize == 0 {
+			fileSize = req.GetImage().GetSize()
 		}
 		if format == "" {
 			format = req.GetImage().GetFormat()
 		}
-		if angle == 0 {
-			angle = req.GetAngle()
+		if any == nil {
+			any = req.GetData()
 		}
-		n, err := f.Write(req.GetImage().File)
+		if transformationType == 0 {
+			transformationType = req.GetType()
+		}
+		_, err = f.Write(req.GetImage().File)
 		if err != nil {
+			logrus.Error("2 ", err)
 			return err
 		}
-		fmt.Printf("Reveived %d bytes from client\n", n)
+		// logrus.Infof("Writing chunk of %d bytes", n)
 	}
+	logrus.WithFields(logrus.Fields{
+		"type":      transformationType,
+		"data":      any,
+		"file_size": fileSize,
+	}).Debug("Transforming image")
 	stat, err := f.Stat()
 	if err != nil {
 		return err
 	}
-	spew.Dump(stat)
-	return nil
-}
-
-func (s *Server) BlurImage(stream pb.IMage_BlurImageServer) error {
-	return nil
-}
-
-func (s *Server) CropImage(stream pb.IMage_CropImageServer) error {
+	if s.DevMode {
+		spew.Dump(stat)
+	}
 	return nil
 }
