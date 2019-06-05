@@ -111,5 +111,7 @@ func (s *Server) TransformImage(stream pb.IMage_TransformImageServer) error {
 	if s.DevMode {
 		spew.Dump(stat)
 	}
+	// b := make([]byte, 2048)
+	// stream.Send(&pb.TransformedImage{})
 	return nil
 }
