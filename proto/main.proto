@@ -3,14 +3,19 @@ syntax = "proto3";
 package proto;
 
 service IMage {
-  rpc RotateImage(stream RotateImageRequest) returns (stream bytes);
-  rpc BlurImage(stream BlurImageRequest) returns (stream bytes);
-  rpc CropImageImage(stream CropImageImageRequest) returns (stream bytes);
+  rpc RotateImage(stream RotateImageRequest) returns (stream TransformedImage);
+  rpc BlurImage(stream BlurImageRequest) returns (stream TransformedImage);
+  rpc CropImage(stream CropImageRequest) returns (stream TransformedImage);
 }
 
 message Image {
   string format = 1;
-  bytes file = 2;
+  int64 size = 2;
+  bytes file = 3;
+}
+
+message TransformedImage {
+  bytes file = 1;
 }
 
 message RotateImageRequest {
