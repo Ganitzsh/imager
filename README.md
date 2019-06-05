@@ -1,2 +1,3 @@
 # 12fact
-Simple app demonstrating the 12FActor app principles
+
+Simple app demonstrating the 12Factor app principles (https://12factor.net/)

@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package proto;
+
+service IMage {
+  rpc RotateImage(stream RotateImageRequest) returns (stream bytes);
+  rpc BlurImage(stream BlurImageRequest) returns (stream bytes);
+  rpc CropImageImage(stream CropImageImageRequest) returns (stream bytes);
+}
+
+message Image {
+  string format = 1;
+  bytes file = 2;
+}
+
+message RotateImageRequest {
+  int32 angle = 1;
+  Image image = 2;
+}
+
+message BlurImageRequest {
+  float sigma = 1;
+  Image image = 2;
+}
+
+message CropImageRequest {
+  int32 topLeftX = 1;
+  int32 topLeftY = 2;
+  int32 width = 3;
+  int32 height = 4;
+
+  Image image = 5;
+}
+
+message NewTokenRequest {
+  string label = 1;
+}
+
+message DeleteTokenRequest {
+  string label = 1;
+}
