@@ -67,7 +67,7 @@ func init() {
 		"port", "p", 0, "port on which the server will listen",
 	)
 	rootCmd.PersistentFlags().StringP(
-		"addr", "a", ":8080", "The server's address",
+		"addr", "a", "", "The server's address",
 	)
 }
 

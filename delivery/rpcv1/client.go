@@ -29,7 +29,9 @@ type Client struct {
 }
 
 func NewClient() (*Client, error) {
-	serverAddr := viper.GetString("Host")
+	serverAddr := fmt.Sprintf(
+		"%s:%d", viper.GetString("Host"), viper.GetInt("Port"),
+	)
 	tlsCert := viper.GetString("TLSCert")
 	var opts []grpc.DialOption
 	if tlsCert != "" {
@@ -47,7 +49,7 @@ func NewClient() (*Client, error) {
 	}
 	bufferSize := viper.GetUint32("BufferSize")
 	if bufferSize == 0 {
-		logrus.Warn("Invalid buffer size")
+		logrus.Warn("Invalid buffer size, setting to 2048 bytes")
 		bufferSize = 2048
 	}
 	return &Client{

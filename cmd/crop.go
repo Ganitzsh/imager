@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strconv"
 
-	pb "github.com/ganitzsh/12fact/proto"
-	"github.com/ganitzsh/12fact/service"
+	"github.com/ganitzsh/12fact/delivery/rpcv1"
+	pb "github.com/ganitzsh/12fact/delivery/rpcv1/proto"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

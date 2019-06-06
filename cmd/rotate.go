@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strconv"
 
-	pb "github.com/ganitzsh/12fact/proto"
-	"github.com/ganitzsh/12fact/service"
+	"github.com/ganitzsh/12fact/delivery/rpcv1"
+	pb "github.com/ganitzsh/12fact/delivery/rpcv1/proto"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -24,8 +24,20 @@ func NewRotateCmdArgs() *RotateCmdArgs {
 }
 
 func (a *RotateCmdArgs) Read(cmd *cobra.Command, args []string) error {
-	angle, _ := strconv.Atoi(args[1])
-	a.Angle = int32(angle)
+	var angle float64
+	var angleInt int
+	var err error
+
+	isInteger := true
+	if angleInt, err = strconv.Atoi(args[1]); err != nil {
+		isInteger = false
+	}
+	angle, _ = strconv.ParseFloat(args[1], 32)
+	a.Angle = float32(angle)
+	if isInteger {
+		a.Angle = float32(angleInt)
+	}
+
 	a.Direction = "counter-clockwise"
 	cw, _ := cmd.Flags().GetBool("cw")
 	if cw {
@@ -77,8 +89,16 @@ var rotateCmd = &cobra.Command{
 		if len(args) != 2 {
 			return errMissingArgs
 		}
-		if _, err := strconv.Atoi(args[0]); err != nil {
-			return errors.New("angle must be a number")
+		isInteger := true
+		if _, err := strconv.Atoi(args[1]); err != nil {
+			isInteger = false
+		}
+		isFloat := true
+		if _, err := strconv.ParseFloat(args[1], 32); err != nil {
+			isFloat = false
+		}
+		if !isFloat && !isInteger {
+			return errors.New("angle must be a valid number")
 		}
 		return nil
 	}),

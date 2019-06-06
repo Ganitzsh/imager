@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strconv"
 
-	pb "github.com/ganitzsh/12fact/proto"
-	"github.com/ganitzsh/12fact/service"
+	"github.com/ganitzsh/12fact/delivery/rpcv1"
+	pb "github.com/ganitzsh/12fact/delivery/rpcv1/proto"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -23,8 +23,19 @@ func NewBlurCmdArgs() *BlurCmdArgs {
 }
 
 func (a *BlurCmdArgs) Read(cmd *cobra.Command, args []string) error {
-	sigma, _ := strconv.ParseFloat(args[1], 32)
+	var sigma float64
+	var sigmaInt int
+	var err error
+
+	isInteger := true
+	if sigmaInt, err = strconv.Atoi(args[1]); err != nil {
+		isInteger = false
+	}
+	sigma, _ = strconv.ParseFloat(args[1], 32)
 	a.Sigma = float32(sigma)
+	if isInteger {
+		a.Sigma = float32(sigmaInt)
+	}
 	a.File = args[0]
 	return nil
 }
@@ -70,8 +81,16 @@ var blurCmd = &cobra.Command{
 		if len(args) != 2 {
 			return errMissingArgs
 		}
-		if _, err := strconv.ParseFloat(args[0], 32); err != nil {
-			return errors.New("sigma must be a floating number")
+		isInteger := true
+		if _, err := strconv.Atoi(args[1]); err != nil {
+			isInteger = false
+		}
+		isFloat := true
+		if _, err := strconv.ParseFloat(args[1], 32); err != nil {
+			isFloat = false
+		}
+		if !isFloat && !isInteger {
+			return errors.New("angle must be a valid number")
 		}
 		return nil
 	}),

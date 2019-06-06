@@ -9,8 +9,9 @@ import (
 	"os"
 	"strings"
 
-	pb "github.com/ganitzsh/12fact/proto"
+	pb "github.com/ganitzsh/12fact/delivery/rpcv1/proto"
 	"github.com/ganitzsh/12fact/service"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/any"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -79,7 +80,7 @@ func (s *RPCServer) TransformImage(stream pb.IMage_TransformImageServer) error {
 			return err
 		}
 		if req.GetImage().GetSize() > s.MaxImageSize {
-			return ErrFileSizeExceeded
+			return service.ErrFileSizeExceeded
 		}
 		if fileSize == 0 {
 			fileSize = req.GetImage().GetSize()
@@ -109,14 +110,23 @@ func (s *RPCServer) TransformImage(stream pb.IMage_TransformImageServer) error {
 		logrus.Errorf("failed to seek beigining of file: %v", err)
 		return err
 	}
-	ret, err := TransformImageFunc(f, format, transformationType, any)
+	message := s.makeMessage(transformationType)
+	if message == nil {
+		return service.ErrInternalError
+	}
+	if err := ptypes.UnmarshalAny(any, message); err != nil {
+		return err
+	}
+	ret, err := service.SingleTransformImage(
+		f, format, s.ToTransfomation(message),
+	)
 	if err != nil {
 		logrus.Errorf("failed to transform image: %v", err)
 		return err
 	}
 	if ret == nil {
 		logrus.Errorf("Something went wrong")
-		return ErrInternalError
+		return service.ErrInternalError
 	}
 	for {
 		buff := make([]byte, s.BufferSize)

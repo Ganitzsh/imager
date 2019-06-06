@@ -2,129 +2,79 @@ package service
 
 import (
 	"bytes"
-	"errors"
 	"image"
-	"image/color"
 	"io"
 	"os"
+	"sync"
 
 	"github.com/disintegration/imaging"
-	pb "github.com/ganitzsh/12fact/proto"
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
-	"github.com/golang/protobuf/ptypes/any"
-	"github.com/sirupsen/logrus"
 )
 
-var formats = map[string]imaging.Format{
-	".jpg":  imaging.JPEG,
-	".jpeg": imaging.JPEG,
-	".png":  imaging.PNG,
-	".tif":  imaging.TIFF,
-	".tiff": imaging.TIFF,
-	".bmp":  imaging.BMP,
-	".gif":  imaging.GIF,
+var mut sync.Mutex
+var exts = []string{
+	".jpg", ".jpeg", ".png", ".tif", ".tiff", ".bmp", ".gif",
+}
+
+var formatConverter = map[string]imaging.Format{
+	exts[0]: imaging.JPEG,
+	exts[1]: imaging.JPEG,
+	exts[2]: imaging.PNG,
+	exts[3]: imaging.TIFF,
+	exts[4]: imaging.TIFF,
+	exts[5]: imaging.BMP,
+	exts[6]: imaging.GIF,
+}
+
+var compatMatrix = map[string]bool{
+	exts[0]: true,
+	exts[1]: true,
+	exts[2]: true,
+	exts[3]: true,
+	exts[4]: true,
+	exts[5]: true,
+	exts[6]: true,
+}
+
+type Transformation interface {
+	GetType() TransformationType
+	Do(img *Image) *Image
 }
 
 func GetFormatFromExtension(ext string) imaging.Format {
-	return formats[ext]
+	mut.Lock()
+	ret := formatConverter[ext]
+	mut.Unlock()
+	return ret
 }
 
-func supportedExt(ext string) bool {
-	switch ext {
-	case ".jpg", ".jpeg", ".png", ".tif", ".tiff", ".bmp", ".gif":
-		return true
-	default:
-		return false
-	}
+func IsCompatible(ext string) bool {
+	mut.Lock()
+	ret := compatMatrix[ext]
+	mut.Unlock()
+	return ret
 }
 
-func TransformImageFunc(
+func TransformImage(
 	f *os.File, ext string,
-	typ TransformationType,
-	data *any.Any,
+	transformations []Transformation,
 ) (io.Reader, error) {
-	if !supportedExt(ext) {
-		return nil, ErrUnsupportedFormat
-	}
-	img, err := imaging.Decode(f)
+	img, err := NewImage(f, ext)
 	if err != nil {
-		logrus.Errorf("failed to decode image: %v", err)
 		return nil, err
 	}
-	var fn func(image.Image, imaging.Format, proto.Message) (io.Reader, error)
-	var out proto.Message
-	switch typ {
-	case pTransformationTypeRotate:
-		out = &pb.RotateImageRequest{}
-		fn = Rotate
-		break
-	case pb.TransformationType_CROP:
-		out = &pb.CropImageRequest{}
-		fn = Crop
-		break
-	case pb.TransformationType_BLUR:
-		out = &pb.BlurImageRequest{}
-		fn = Blur
-		break
-	default:
-		return nil, errors.New("Unkown transformation type")
+	for _, t := range transformations {
+		if err := t.Do(img).Err(); err != nil {
+			return nil, err
+		}
 	}
-	if err := ptypes.UnmarshalAny(data, out); err != nil {
-		return nil, err
-	}
-	return fn(img, formats[ext], out)
+	return imageBuffer(img.Image, img.Format)
 }
 
-func Rotate(
-	img image.Image,
-	format imaging.Format,
-	req interface{},
+func SingleTransformImage(
+	f *os.File, ext string,
+	transformation Transformation,
 ) (io.Reader, error) {
-	direction := -1.0
-	args := req.(*pb.RotateImageRequest)
-	if args.GetClockWise() {
-		direction *= 1.0
-	}
-	return imageBuffer(imaging.Rotate(
-		img, float64(args.GetAngle())*direction, color.Black,
-	), format)
-}
-
-type CropOptions struct {
-	TopLeftX int
-	TopLeftY int
-	Width    int
-	Height   int
-}
-
-func Crop(
-	img image.Image,
-	format imaging.Format,
-	req interface{},
-) (io.Reader, error) {
-	args, ok := req.(*CropOptions)
-	if !ok {
-		return nil, ErrInternalError
-	}
-	return imageBuffer(imaging.Crop(img, image.Rect(
-		args.TopLeftX, args.TopLeftY,
-		args.TopLeftX+args.Width, args.TopLeftY+args.Height,
-	)), format)
-}
-
-type CropOptions struct {
-	TopLeftX int
-}
-
-func Blur(
-	img image.Image,
-	format imaging.Format,
-	req interface{},
-) (io.Reader, error) {
-	return imageBuffer(imaging.Blur(
-		img, float64(req.(*pb.BlurImageRequest).GetSigma()),
-	), format)
+	return TransformImage(f, ext, []Transformation{transformation})
 }
 
 func imageBuffer(img image.Image, format imaging.Format) (io.Reader, error) {
