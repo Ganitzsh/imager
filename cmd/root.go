@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/ganitzsh/12fact/service"
+	"github.com/ganitzsh/12fact/delivery/rpcv1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -16,6 +16,10 @@ var (
 	errNoArgs      = errors.New("No arguments given, please read the help")
 	errMissingArgs = errors.New("Missing arguments")
 )
+
+type CmdArgs interface {
+	Read(cmd *cobra.Command, args []string) error
+}
 
 var (
 	flagCfgFile string
@@ -31,7 +35,7 @@ var rootCmd = &cobra.Command{
 	In order to use the cli you need to have setup a token either as a environment
 	variable or directly in the config file`,
 	Run: func(cmd *cobra.Command, args []string) {
-		service, err := service.NewServer()
+		service, err := rpcv1.NewRPCServer()
 		if err != nil {
 			logrus.Error(err)
 			os.Exit(1)
@@ -77,6 +81,7 @@ func initConfig() {
 	viper.SetDefault("Port", 8080)
 	viper.SetDefault("DevMode", true)
 	viper.SetDefault("MaxImageSize", 25165824) // Default is 24MB
+	viper.SetDefault("BufferSize", 2048)
 	viper.BindPFlag("Port", rootCmd.Flags().Lookup("port"))
 	viper.BindPFlag("Host", rootCmd.Flags().Lookup("addr"))
 	viper.SetConfigFile(flagCfgFile)

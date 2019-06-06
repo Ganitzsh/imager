@@ -32,6 +32,7 @@ message TransformImageRequest {
 
 message RotateImageRequest {
   int32 angle = 1;
+  bool clockWise = 2;
 }
 
 message BlurImageRequest {

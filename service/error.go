@@ -21,10 +21,6 @@ func (e ServiceError) Error() string {
 }
 
 var (
-	ErrMissingGRPCAuthData = NewServiceError(
-		"grpc_missing_data",
-		"Missing auth data in GRPC call",
-	)
 	ErrTokenInvalid = NewServiceError(
 		"token_invalid",
 		"The given token is invalid",
@@ -44,5 +40,9 @@ var (
 	ErrUnsupportedFormat = NewServiceError(
 		"unsupported_format",
 		"Unsupported image format",
+	)
+	ErrInternalError = NewServiceError(
+		"internal_error",
+		"An internal error occured",
 	)
 )

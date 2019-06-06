@@ -14,6 +14,8 @@ type Config struct {
 
 	MaxImageSize int64
 	Port         int32
+	Host         string
+	BufferSize   uint32
 }
 
 func NewConfig() (*Config, error) {
@@ -25,8 +27,10 @@ func NewConfig() (*Config, error) {
 		TLSKey:     viper.GetString("TLSKey"),
 
 		Port: viper.GetInt32("Port"),
+		Host: viper.GetString("Host"),
 
 		MaxImageSize: viper.GetInt64("MaxImageSize"),
+		BufferSize:   viper.GetUint32("BufferSize"),
 	}
 	return &c, c.validate()
 }

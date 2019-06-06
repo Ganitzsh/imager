@@ -8,12 +8,12 @@ import (
 	"io"
 	"os"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/disintegration/imaging"
 	pb "github.com/ganitzsh/12fact/proto"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/any"
+	"github.com/sirupsen/logrus"
 )
 
 var formats = map[string]imaging.Format{
@@ -26,32 +26,46 @@ var formats = map[string]imaging.Format{
 	".gif":  imaging.GIF,
 }
 
-func (s *Server) transformImage(
+func GetFormatFromExtension(ext string) imaging.Format {
+	return formats[ext]
+}
+
+func supportedExt(ext string) bool {
+	switch ext {
+	case ".jpg", ".jpeg", ".png", ".tif", ".tiff", ".bmp", ".gif":
+		return true
+	default:
+		return false
+	}
+}
+
+func TransformImageFunc(
 	f *os.File, ext string,
-	typ pb.TransformationType,
+	typ TransformationType,
 	data *any.Any,
 ) (io.Reader, error) {
-	if formats[ext] == 0 {
+	if !supportedExt(ext) {
 		return nil, ErrUnsupportedFormat
 	}
 	img, err := imaging.Decode(f)
 	if err != nil {
+		logrus.Errorf("failed to decode image: %v", err)
 		return nil, err
 	}
-	var fn func(image.Image, imaging.Format, interface{}) (io.Reader, error)
+	var fn func(image.Image, imaging.Format, proto.Message) (io.Reader, error)
 	var out proto.Message
 	switch typ {
-	case pb.TransformationType_ROTATE:
+	case pTransformationTypeRotate:
 		out = &pb.RotateImageRequest{}
-		fn = rotate
+		fn = Rotate
 		break
 	case pb.TransformationType_CROP:
 		out = &pb.CropImageRequest{}
-		fn = crop
+		fn = Crop
 		break
 	case pb.TransformationType_BLUR:
 		out = &pb.BlurImageRequest{}
-		fn = blur
+		fn = Blur
 		break
 	default:
 		return nil, errors.New("Unkown transformation type")
@@ -59,36 +73,58 @@ func (s *Server) transformImage(
 	if err := ptypes.UnmarshalAny(data, out); err != nil {
 		return nil, err
 	}
-	if s.DevMode {
-		spew.Dump(out)
-	}
-	return fn(img, formats[ext], &out)
+	return fn(img, formats[ext], out)
 }
 
-func rotate(
+func Rotate(
 	img image.Image,
 	format imaging.Format,
 	req interface{},
 ) (io.Reader, error) {
+	direction := -1.0
+	args := req.(*pb.RotateImageRequest)
+	if args.GetClockWise() {
+		direction *= 1.0
+	}
 	return imageBuffer(imaging.Rotate(
-		img, float64(req.(*pb.RotateImageRequest).GetAngle()), color.Black,
+		img, float64(args.GetAngle())*direction, color.Black,
 	), format)
 }
 
-func crop(
-	img image.Image,
-	format imaging.Format,
-	req interface{},
-) (io.Reader, error) {
-	return nil, nil
+type CropOptions struct {
+	TopLeftX int
+	TopLeftY int
+	Width    int
+	Height   int
 }
 
-func blur(
+func Crop(
 	img image.Image,
 	format imaging.Format,
 	req interface{},
 ) (io.Reader, error) {
-	return nil, nil
+	args, ok := req.(*CropOptions)
+	if !ok {
+		return nil, ErrInternalError
+	}
+	return imageBuffer(imaging.Crop(img, image.Rect(
+		args.TopLeftX, args.TopLeftY,
+		args.TopLeftX+args.Width, args.TopLeftY+args.Height,
+	)), format)
+}
+
+type CropOptions struct {
+	TopLeftX int
+}
+
+func Blur(
+	img image.Image,
+	format imaging.Format,
+	req interface{},
+) (io.Reader, error) {
+	return imageBuffer(imaging.Blur(
+		img, float64(req.(*pb.BlurImageRequest).GetSigma()),
+	), format)
 }
 
 func imageBuffer(img image.Image, format imaging.Format) (io.Reader, error) {
