@@ -4,7 +4,6 @@ import (
 	"image/color"
 
 	"github.com/disintegration/imaging"
-	"github.com/sirupsen/logrus"
 )
 
 type Rotate struct {
@@ -33,12 +32,11 @@ func (Rotate) GetType() TransformationType {
 }
 
 func (t *Rotate) Do(img *Image) *Image {
-	direction := -1.0
+	direction := 1.0
 	if t.ClockWise {
-		direction *= 1.0
+		direction = -1.0
 	}
 	finalAngle := t.Angle * direction
-	logrus.Info("Rotating: ", finalAngle)
 	img.Image = imaging.Rotate(img, finalAngle, color.Black)
 	return img
 }

@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/davecgh/go-spew/spew"
+	"github.com/ganitzsh/12fact/delivery/httpv1"
 	"github.com/ganitzsh/12fact/delivery/rpcv1"
+	"github.com/ganitzsh/12fact/service"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -35,15 +36,18 @@ var rootCmd = &cobra.Command{
 	In order to use the cli you need to have setup a token either as a environment
 	variable or directly in the config file`,
 	Run: func(cmd *cobra.Command, args []string) {
-		service, err := rpcv1.NewRPCServer()
+		cfg, err := service.NewConfig()
 		if err != nil {
 			logrus.Error(err)
 			os.Exit(1)
 		}
-		if service.DevMode {
-			spew.Dump(service.Config)
+		if cfg.DevMode {
+			logrus.SetLevel(logrus.DebugLevel)
 		}
-		if err := service.ListenAndServe(); err != nil {
+		if cfg.HTTPEnabled {
+			go httpv1.NewHTTPServerV1(cfg).ListenAndServe()
+		}
+		if err := rpcv1.NewRPCServer(cfg).ListenAndServe(); err != nil {
 			logrus.Error(err)
 			os.Exit(1)
 		}
@@ -69,6 +73,9 @@ func init() {
 	rootCmd.PersistentFlags().StringP(
 		"addr", "a", "", "The server's address",
 	)
+	rootCmd.PersistentFlags().Bool(
+		"http", false, "",
+	)
 }
 
 func initConfig() {
@@ -82,8 +89,11 @@ func initConfig() {
 	viper.SetDefault("DevMode", true)
 	viper.SetDefault("MaxImageSize", 25165824) // Default is 24MB
 	viper.SetDefault("BufferSize", 2048)
+	viper.SetDefault("HTTPEnabled", false)
+	viper.SetDefault("HTTPPort", 8081)
 	viper.BindPFlag("Port", rootCmd.Flags().Lookup("port"))
 	viper.BindPFlag("Host", rootCmd.Flags().Lookup("addr"))
+	viper.BindPFlag("HTTPEnabled", rootCmd.Flags().Lookup("http"))
 	viper.SetConfigFile(flagCfgFile)
 
 	viper.AutomaticEnv()

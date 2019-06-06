@@ -43,6 +43,7 @@ func (a *RotateCmdArgs) Read(cmd *cobra.Command, args []string) error {
 	if cw {
 		a.Direction = "clockwise"
 	}
+	a.ClockWise = cw
 	a.File = args[0]
 	return nil
 }

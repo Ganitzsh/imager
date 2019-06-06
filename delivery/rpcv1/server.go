@@ -22,20 +22,14 @@ type RPCServer struct {
 	*service.Config
 }
 
-func NewRPCServer() (*RPCServer, error) {
-	cfg, err := service.NewConfig()
-	if err != nil {
-		return nil, err
-	}
+func NewRPCServer(cfg *service.Config) *RPCServer {
 	return &RPCServer{
 		Config: cfg,
-	}, nil
+	}
 }
 
 func (s *RPCServer) ListenAndServe() error {
-	if s.DevMode {
-		logrus.SetLevel(logrus.DebugLevel)
-	}
+
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", s.Host, s.Port))
 	if err != nil {
 		return err

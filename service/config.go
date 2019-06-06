@@ -16,6 +16,9 @@ type Config struct {
 	Port         int32
 	Host         string
 	BufferSize   uint32
+
+	HTTPEnabled bool
+	HTTPPort    int32
 }
 
 func NewConfig() (*Config, error) {
@@ -31,6 +34,9 @@ func NewConfig() (*Config, error) {
 
 		MaxImageSize: viper.GetInt64("MaxImageSize"),
 		BufferSize:   viper.GetUint32("BufferSize"),
+
+		HTTPEnabled: viper.GetBool("HTTPEnabled"),
+		HTTPPort:    viper.GetInt32("HTTPPort"),
 	}
 	return &c, c.validate()
 }

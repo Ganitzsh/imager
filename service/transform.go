@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"image"
 	"io"
-	"os"
 	"sync"
 
 	"github.com/disintegration/imaging"
@@ -55,7 +54,7 @@ func IsCompatible(ext string) bool {
 }
 
 func TransformImage(
-	f *os.File, ext string,
+	f io.Reader, ext string,
 	transformations []Transformation,
 ) (io.Reader, error) {
 	img, err := NewImage(f, ext)
@@ -71,7 +70,7 @@ func TransformImage(
 }
 
 func SingleTransformImage(
-	f *os.File, ext string,
+	f io.Reader, ext string,
 	transformation Transformation,
 ) (io.Reader, error) {
 	return TransformImage(f, ext, []Transformation{transformation})
