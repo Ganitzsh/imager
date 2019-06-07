@@ -1,10 +1,9 @@
 module github.com/ganitzsh/12fact
 
 require (
-	github.com/davecgh/go-spew v1.1.1
 	github.com/disintegration/imaging v1.6.0
 	github.com/gin-contrib/sse v0.1.0 // indirect
-	github.com/gin-gonic/gin v1.4.0 // indirect
+	github.com/gin-gonic/gin v1.4.0
 	github.com/golang/protobuf v1.3.1
 	github.com/hashicorp/consul/api v1.1.0
 	github.com/mattn/go-isatty v0.0.8 // indirect

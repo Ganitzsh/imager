@@ -74,7 +74,10 @@ func init() {
 		"addr", "a", "", "The server's address",
 	)
 	rootCmd.PersistentFlags().Bool(
-		"http", false, "",
+		"http", false, "In server mode, starts the HTTP server (default port 8081)",
+	)
+	rootCmd.PersistentFlags().Int32(
+		"http-port", 8081, "",
 	)
 }
 
@@ -93,6 +96,7 @@ func initConfig() {
 	viper.SetDefault("HTTPPort", 8081)
 	viper.BindPFlag("Port", rootCmd.Flags().Lookup("port"))
 	viper.BindPFlag("Host", rootCmd.Flags().Lookup("addr"))
+	viper.BindPFlag("HTTPPort", rootCmd.Flags().Lookup("http-port"))
 	viper.BindPFlag("HTTPEnabled", rootCmd.Flags().Lookup("http"))
 	viper.SetConfigFile(flagCfgFile)
 
