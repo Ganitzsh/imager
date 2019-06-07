@@ -29,7 +29,6 @@ func NewRPCServer(cfg *service.Config) *RPCServer {
 }
 
 func (s *RPCServer) ListenAndServe() error {
-
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", s.Host, s.Port))
 	if err != nil {
 		return err
@@ -42,6 +41,7 @@ func (s *RPCServer) ListenAndServe() error {
 		}
 		opts = []grpc.ServerOption{grpc.Creds(creds)}
 	}
+	opts = append(opts, midLogCall())
 	grpcServer := grpc.NewServer(opts...)
 	pb.RegisterIMageServer(grpcServer, s)
 	logrus.Info("RPC server started on port ", s.Port)

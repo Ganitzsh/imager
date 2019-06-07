@@ -44,9 +44,10 @@ func (s *HTTPServerV1) ListenAndServe() error {
 }
 
 func (s *HTTPServerV1) GetHandler() http.Handler {
-	ret := gin.Default()
+	ret := gin.New()
+	ret.Use(midLogrusLogger)
 	ret.Use(midCheckErrors)
-	v1 := ret.Group("/api/v1")
+	v1 := ret.Group("/api/v1", midValidateToken)
 	{
 		s.Image.Plug(v1)
 	}

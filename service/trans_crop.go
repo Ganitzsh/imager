@@ -4,6 +4,7 @@ import (
 	"image"
 
 	"github.com/disintegration/imaging"
+	"github.com/sirupsen/logrus"
 )
 
 type Crop struct {
@@ -17,6 +18,15 @@ type Crop struct {
 
 func NewCrop() *Crop {
 	return &Crop{}
+}
+
+func (t *Crop) Log() {
+	LogTransformation(t, logrus.Fields{
+		"top_left_x": t.TopLeftX,
+		"top_left_y": t.TopLeftY,
+		"width":      t.Width,
+		"height":     t.Height,
+	})
 }
 
 func (t *Crop) SetTopLeftX(value int) *Crop {

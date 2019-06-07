@@ -1,5 +1,5 @@
 package service
 
-func validateToken() {}
-
-func createToken() {}
+func ValidateToken(token string) error {
+	return nil
+}

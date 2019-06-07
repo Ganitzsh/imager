@@ -37,6 +37,7 @@ var compatMatrix = map[string]bool{
 type Transformation interface {
 	GetType() TransformationType
 	Do(img *Image) *Image
+	Log()
 }
 
 func GetFormatFromExtension(ext string) imaging.Format {
@@ -62,6 +63,7 @@ func TransformImage(
 		return nil, err
 	}
 	for _, t := range transformations {
+		t.Log()
 		if err := t.Do(img).Err(); err != nil {
 			return nil, err
 		}

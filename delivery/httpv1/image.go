@@ -88,7 +88,7 @@ type BlurPayload struct {
 
 func (h *ImageHandler) Blur(c *gin.Context) {
 	p := BlurPayload{}
-	if err := c.Bind(&p); err != nil {
+	if err := c.ShouldBind(&p); err != nil {
 		c.Error(ErrInvalidInput)
 		return
 	}
@@ -116,7 +116,7 @@ type CropPayload struct {
 
 func (h *ImageHandler) Crop(c *gin.Context) {
 	p := CropPayload{}
-	if err := c.Bind(&p); err != nil {
+	if err := c.ShouldBind(&p); err != nil {
 		c.Error(ErrInvalidInput)
 		return
 	}

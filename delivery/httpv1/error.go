@@ -44,4 +44,9 @@ var (
 		"Invalid input. Check the body of your request",
 		http.StatusBadRequest,
 	)
+	ErrTokenInvalid = NewHandlerError(
+		service.ErrTokenInvalid.Code,
+		service.ErrTokenInvalid.Message,
+		http.StatusUnauthorized,
+	)
 )

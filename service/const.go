@@ -1,9 +1,9 @@
 package service
 
-type TransformationType int
+type TransformationType string
 
 const (
-	TransformationTypeRotate = iota
-	TransformationTypeBlur
-	TransformationTypeCrop
+	TransformationTypeRotate TransformationType = "rotate"
+	TransformationTypeBlur   TransformationType = "blur"
+	TransformationTypeCrop   TransformationType = "crop"
 )
