@@ -198,6 +198,8 @@ applying transformations would look like this:
 package main
 
 ```go
+package main
+
 import (
 	"io"
 	"os"
@@ -227,6 +229,16 @@ func main() {
 		panic(err)
 	}
 
+	out, err := os.Create("./out.png")
+	if err != nil {
+		panic(err)
+	}
+	defer out.Close()
+
+	if _, e := io.Copy(out, ret); e != nil {
+		panic(e)
+	}
+
 	// You can also apply multiple transforamtions at once
 	transformations := []trans.Transformation{
 		trans.NewCrop().
@@ -235,18 +247,19 @@ func main() {
 		trans.NewBlur().SetSigma(3.7),
 	}
 
-	ret, err := trans.TransformImage(f, ext, transformations)
+	f.Seek(0, 0)
+	ret2, err := trans.TransformImage(f, ext, transformations)
 	if err != nil {
 		panic(err)
 	}
 
-	out, err := os.Create("./out.png")
+	out2, err := os.Create("./out2.png")
 	if err != nil {
 		panic(err)
 	}
-	defer out.Close()
+	defer out2.Close()
 
-	if _, err := io.Copy(out, ret); err != nil {
+	if _, err := io.Copy(out2, ret2); err != nil {
 		panic(err)
 	}
 }
