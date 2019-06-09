@@ -47,8 +47,11 @@ func (s *HTTPServerV1) GetHandler() http.Handler {
 	ret := gin.New()
 	ret.Use(midLogrusLogger)
 	ret.Use(midCheckErrors)
-	v1 := ret.Group("/api/v1", midValidateToken)
+	v1 := ret.Group("/api/v1")
 	{
+		if !s.DevMode {
+			v1.Use(midValidateToken)
+		}
 		s.Image.Plug(v1)
 	}
 	return ret

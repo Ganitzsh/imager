@@ -8,6 +8,7 @@ import (
 
 	"github.com/ganitzsh/12fact/service"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 type ImageHandler struct{}
@@ -71,6 +72,7 @@ func (h *ImageHandler) Rotate(c *gin.Context) {
 		c.Error(err)
 		return
 	}
+	logrus.Info(ct)
 	f, err := service.SingleTransformImage(file, ext, &service.Rotate{
 		Angle:     p.Angle,
 		ClockWise: p.ClockWise,
