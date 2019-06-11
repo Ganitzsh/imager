@@ -3,6 +3,7 @@ package service
 import (
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/hashicorp/consul/api"
 )
 
@@ -10,11 +11,14 @@ type Token struct {
 	CreatedAt time.Time
 	ValidFor  time.Duration
 	Label     string
-	Value     string
+	Value     uuid.UUID
 }
 
 func NewToken() *Token {
-	return &Token{}
+	return &Token{
+		CreatedAt: time.Now(),
+		Value:     uuid.New(),
+	}
 }
 
 func (t *Token) SetCreatedAt(value time.Time) *Token {
@@ -32,7 +36,7 @@ func (t *Token) SetLabel(value string) *Token {
 	return t
 }
 
-func (t *Token) SetValue(value string) *Token {
+func (t *Token) SetValue(value uuid.UUID) *Token {
 	t.Value = value
 	return t
 }
@@ -40,9 +44,9 @@ func (t *Token) SetValue(value string) *Token {
 // TokenStore is an interface defining the behaviour of the store that will be
 // responsible for manipulating the authentication tokens from the storage
 type TokenStore interface {
-	FindByValue(value string) (*Token, error)
+	FindByValue(value uuid.UUID) (*Token, error)
 	FindByLabel(label string) (*Token, error)
-	Remove(value string) error
+	Remove(value uuid.UUID) error
 	Save(t *Token) (*Token, error)
 }
 
@@ -50,8 +54,8 @@ type TokenStore interface {
 // tokens
 type TokenUseCase interface {
 	GenerateToken(label string) (*Token, error)
-	ValidateToken(value string) error
-	RemoveToken(value string) error
+	ValidateToken(t *Token) error
+	RemoveToken(t *Token) error
 }
 
 // TokenStoreConsul is an implemetation of the TokenStore backed by the
@@ -64,7 +68,7 @@ func NewTokenStoreConsul() *TokenStoreConsul {
 	return &TokenStoreConsul{}
 }
 
-func (s *TokenStoreConsul) FindByValue(value string) (*Token, error) {
+func (s *TokenStoreConsul) FindByValue(value uuid.UUID) (*Token, error) {
 	return nil, nil
 }
 
@@ -72,7 +76,7 @@ func (s *TokenStoreConsul) FindByLabel(value string) (*Token, error) {
 	return nil, nil
 }
 
-func (s *TokenStoreConsul) Remove(value string) error {
+func (s *TokenStoreConsul) Remove(value uuid.UUID) error {
 	return nil
 }
 

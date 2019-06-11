@@ -21,6 +21,14 @@ func (e ServiceError) Error() string {
 }
 
 var (
+	ErrResourceNotFound = NewServiceError(
+		"resource_not_found",
+		"The given resource could not be found",
+	)
+	ErrResourceAlreadyExists = NewServiceError(
+		"resource_already_exists",
+		"A resource with the same values already exists",
+	)
 	ErrTokenInvalid = NewServiceError(
 		"token_invalid",
 		"The given token is invalid",
@@ -42,6 +50,10 @@ var (
 		"Unsupported image format",
 	)
 	ErrInternalError = NewServiceError(
+		"internal_error",
+		"An internal error occured",
+	)
+	ErrDivideByZeroError = NewServiceError(
 		"internal_error",
 		"An internal error occured",
 	)

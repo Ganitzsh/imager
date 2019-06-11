@@ -12,15 +12,15 @@ import (
 func TestToTransformation(t *testing.T) {
 	s := rpcv1.NewRPCServer(nil)
 	rotate := &pb.RotateImageRequest{
-		Angle:     45.32,
+		Angle:     45,
 		ClockWise: true,
 	}
 	transformedRotate := s.ToTransfomation(rotate)
 	require.NotNil(t, transformedRotate)
 	require.EqualValues(t, &service.Rotate{
-		Angle:     45.32,
+		Angle:     45,
 		ClockWise: true,
-	}, rotate)
+	}, transformedRotate)
 	blur := &pb.BlurImageRequest{
 		Sigma: 2.0,
 	}
@@ -28,7 +28,7 @@ func TestToTransformation(t *testing.T) {
 	require.NotNil(t, transformedBlur)
 	require.EqualValues(t, &service.Blur{
 		Sigma: 2.0,
-	}, blur)
+	}, transformedBlur)
 	crop := &pb.CropImageRequest{
 		TopLeftX: 590,
 		TopLeftY: 104,
@@ -42,5 +42,5 @@ func TestToTransformation(t *testing.T) {
 		TopLeftY: 104,
 		Width:    450,
 		Height:   900,
-	}, crop)
+	}, transformedCrop)
 }

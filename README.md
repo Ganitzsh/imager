@@ -264,3 +264,13 @@ func main() {
 	}
 }
 ```
+
+## Development
+
+Feel free to fork and and create PRs! It can always get better.
+
+### Run tests
+
+To run tests, use the `Makefile`:
+
+    make test
