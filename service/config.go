@@ -1,6 +1,8 @@
 package service
 
 import (
+	"strings"
+
 	humanize "github.com/dustin/go-humanize"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -22,18 +24,19 @@ func InitConfig() {
 	viper.SetDefault("http.enabled", false)
 	viper.SetDefault("http.port", 8081)
 
-	viper.SetDefault("store.type", StoreTypeRedis)
+	viper.SetDefault("store.type", string(StoreTypeRedis))
 	viper.SetDefault("store.redis.host", "localhost:6379")
 	viper.SetDefault("store.redis.user", "")
 	viper.SetDefault("store.redis.password", "")
 	viper.SetDefault("store.redis.db", 0)
 
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err == nil {
 		logrus.Info("Using config file:", viper.ConfigFileUsed())
 	} else {
-		logrus.Errorf("Failed to read config file: %v", err)
+		logrus.Warnf("Failed to read config file: %v", err)
 	}
 }
 

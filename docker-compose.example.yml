@@ -1,0 +1,13 @@
+version: "3.7"
+
+services:
+  transformer-server:
+    build: .
+    environment:
+      - API_HTTP_ENABLED=true
+      - API_STORE_REDIS_HOST=redis:6379
+    ports:
+      - 8080:8080
+      - 8081:8081
+  redis:
+    image: redis:latest

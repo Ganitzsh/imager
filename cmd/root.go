@@ -42,8 +42,8 @@ var rootCmd = &cobra.Command{
 			logrus.Error(err)
 			os.Exit(1)
 		}
+		spew.Dump(cfg)
 		if cfg.DevMode {
-			spew.Dump(cfg)
 			logrus.SetLevel(logrus.DebugLevel)
 		}
 		ts, err := service.GetTokenStore(cfg)
