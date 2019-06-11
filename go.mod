@@ -5,6 +5,7 @@ require (
 	github.com/bxcodec/faker/v3 v3.1.0
 	github.com/davecgh/go-spew v1.1.1
 	github.com/disintegration/imaging v1.6.0
+	github.com/dustin/go-humanize v1.0.0
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.4.0
 	github.com/go-redis/redis v6.15.2+incompatible
