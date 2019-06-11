@@ -82,4 +82,24 @@ Run admin/management tasks as one-off processes
 
 It is possible to use the same binary to execute custom commands that can be
 easily added. For example, generating a new token in the server can be done
-using the `cli`
+using the `cli` (Still WIP)
+
+## Prove how it fits and uses the best cloud native understanding
+
+This app is easily deployable in a cluster and does not require any extra
+configuration on a machine to run it.
+
+It is easily upgradeable via docker images and you could roll out an update as
+soon as a new version passes the tests and is pushed online.
+
+It is very scalable both horizontally and vertically.
+
+It can run in a container, a VM or directly on a host with no configuration
+changes.
+
+## How would this service be accessed and used from an external client from the cluster?
+
+Exposing either the RPC server port or the HTTP server port makes it accessible
+from the outside the cluster. This can be done using Kubernetes to create a
+deployment where a service will expose the cluster's nodes or using
+docker-compose
