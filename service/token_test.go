@@ -194,7 +194,11 @@ func testTokenUseCaseRemoveToken(
 // TokenStoreRedis tests
 
 func getTokenStoreRedis() *service.TokenStoreRedis {
-	return service.NewTokenStoreRedis()
+	s, err := service.NewTokenStoreRedis(nil)
+	if err != nil {
+		panic(err)
+	}
+	return s
 }
 
 func TestTokenStoreRedisFindByValue(t *testing.T) {
