@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/ganitzsh/12fact/delivery/httpv1"
 	"github.com/ganitzsh/12fact/delivery/rpcv1"
 	"github.com/ganitzsh/12fact/service"
@@ -41,6 +42,7 @@ var rootCmd = &cobra.Command{
 			logrus.Error(err)
 			os.Exit(1)
 		}
+		spew.Dump(cfg)
 		if cfg.DevMode {
 			logrus.SetLevel(logrus.DebugLevel)
 		}
@@ -62,7 +64,16 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
+	cobra.OnInitialize(func() {
+		service.InitConfig()
+
+		viper.BindPFlag("Port", rootCmd.Flags().Lookup("port"))
+		viper.BindPFlag("Host", rootCmd.Flags().Lookup("addr"))
+		viper.BindPFlag("HTTP.Enabled", rootCmd.Flags().Lookup("http"))
+		viper.BindPFlag("HTTP.Port", rootCmd.Flags().Lookup("http-port"))
+
+		viper.SetConfigFile(flagCfgFile)
+	})
 
 	rootCmd.Flags().StringVarP(
 		&flagCfgFile, "config", "c", "", "config file (default is ./config.yml)",
@@ -79,30 +90,4 @@ func init() {
 	rootCmd.PersistentFlags().Int32(
 		"http-port", 8081, "",
 	)
-}
-
-func initConfig() {
-	viper.SetConfigType("YAML")
-	viper.SetConfigName("config")
-	viper.AddConfigPath(".")
-
-	viper.SetEnvPrefix("API")
-
-	viper.SetDefault("Port", 8080)
-	viper.SetDefault("DevMode", true)
-	viper.SetDefault("MaxImageSize", 25165824) // Default is 24MB
-	viper.SetDefault("BufferSize", 2048)
-	viper.SetDefault("HTTPEnabled", false)
-	viper.SetDefault("HTTPPort", 8081)
-	viper.BindPFlag("Port", rootCmd.Flags().Lookup("port"))
-	viper.BindPFlag("Host", rootCmd.Flags().Lookup("addr"))
-	viper.BindPFlag("HTTPPort", rootCmd.Flags().Lookup("http-port"))
-	viper.BindPFlag("HTTPEnabled", rootCmd.Flags().Lookup("http"))
-	viper.SetConfigFile(flagCfgFile)
-
-	viper.AutomaticEnv()
-
-	if err := viper.ReadInConfig(); err == nil {
-		logrus.Info("Using config file:", viper.ConfigFileUsed())
-	}
 }

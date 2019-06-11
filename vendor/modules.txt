@@ -1,8 +1,6 @@
-# github.com/armon/go-metrics v0.0.0-20180917152333-f0300d1749da
-github.com/armon/go-metrics
-# github.com/bxcodec/faker v2.0.1+incompatible
-github.com/bxcodec/faker
-github.com/bxcodec/faker/support/slice
+# github.com/bxcodec/faker/v3 v3.1.0
+github.com/bxcodec/faker/v3
+github.com/bxcodec/faker/v3/support/slice
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
 # github.com/disintegration/imaging v1.6.0
@@ -16,6 +14,14 @@ github.com/gin-gonic/gin
 github.com/gin-gonic/gin/binding
 github.com/gin-gonic/gin/internal/json
 github.com/gin-gonic/gin/render
+# github.com/go-redis/redis v6.15.2+incompatible
+github.com/go-redis/redis
+github.com/go-redis/redis/internal
+github.com/go-redis/redis/internal/consistenthash
+github.com/go-redis/redis/internal/hashtag
+github.com/go-redis/redis/internal/pool
+github.com/go-redis/redis/internal/proto
+github.com/go-redis/redis/internal/util
 # github.com/golang/protobuf v1.3.1
 github.com/golang/protobuf/proto
 github.com/golang/protobuf/ptypes
@@ -24,16 +30,6 @@ github.com/golang/protobuf/ptypes/duration
 github.com/golang/protobuf/ptypes/timestamp
 # github.com/google/uuid v1.1.1
 github.com/google/uuid
-# github.com/hashicorp/consul/api v1.1.0
-github.com/hashicorp/consul/api
-# github.com/hashicorp/go-cleanhttp v0.5.1
-github.com/hashicorp/go-cleanhttp
-# github.com/hashicorp/go-immutable-radix v1.0.0
-github.com/hashicorp/go-immutable-radix
-# github.com/hashicorp/go-rootcerts v1.0.0
-github.com/hashicorp/go-rootcerts
-# github.com/hashicorp/golang-lru v0.5.0
-github.com/hashicorp/golang-lru/simplelru
 # github.com/hashicorp/hcl v1.0.0
 github.com/hashicorp/hcl
 github.com/hashicorp/hcl/hcl/printer
@@ -45,10 +41,10 @@ github.com/hashicorp/hcl/hcl/scanner
 github.com/hashicorp/hcl/hcl/strconv
 github.com/hashicorp/hcl/json/scanner
 github.com/hashicorp/hcl/json/token
-# github.com/hashicorp/serf v0.8.2
-github.com/hashicorp/serf/coordinate
 # github.com/inconshreveable/mousetrap v1.0.0
 github.com/inconshreveable/mousetrap
+# github.com/itsjamie/gin-cors v0.0.0-20160420130702-97b4a9da7933
+github.com/itsjamie/gin-cors
 # github.com/json-iterator/go v1.1.6
 github.com/json-iterator/go
 # github.com/konsorten/go-windows-terminal-sequences v1.0.1
@@ -57,8 +53,6 @@ github.com/konsorten/go-windows-terminal-sequences
 github.com/magiconair/properties
 # github.com/mattn/go-isatty v0.0.8
 github.com/mattn/go-isatty
-# github.com/mitchellh/go-homedir v1.1.0
-github.com/mitchellh/go-homedir
 # github.com/mitchellh/mapstructure v1.1.2
 github.com/mitchellh/mapstructure
 # github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd

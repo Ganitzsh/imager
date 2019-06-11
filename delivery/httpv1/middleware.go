@@ -8,6 +8,7 @@ import (
 
 	"github.com/ganitzsh/12fact/service"
 	"github.com/gin-gonic/gin"
+	cors "github.com/itsjamie/gin-cors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -94,4 +95,23 @@ func midLogrusLogger(c *gin.Context) {
 		"data_length": dataLength,
 		"status":      statusCode,
 	}).Info("New HTTP request")
+}
+
+func midCors() func(c *gin.Context) {
+	ret := cors.Middleware(cors.Config{
+		Origins:         "*",
+		Methods:         "GET, PUT, POST, DELETE, PATCH, OPTIONS",
+		RequestHeaders:  "Origin, Authorization, Content-Type",
+		ExposedHeaders:  "",
+		MaxAge:          50 * time.Second,
+		Credentials:     true,
+		ValidateHeaders: false,
+	})
+	return func(c *gin.Context) {
+		if c.IsAborted() {
+			c.Next()
+			return
+		}
+		ret(c)
+	}
 }

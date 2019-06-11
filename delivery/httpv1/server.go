@@ -45,6 +45,7 @@ func (s *HTTPServerV1) ListenAndServe() error {
 
 func (s *HTTPServerV1) GetHandler() http.Handler {
 	ret := gin.New()
+	ret.Use(midCors())
 	ret.Use(midLogrusLogger)
 	ret.Use(midCheckErrors)
 	v1 := ret.Group("/api/v1")

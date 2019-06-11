@@ -191,26 +191,26 @@ func testTokenUseCaseRemoveToken(
 	}
 }
 
-// TokenStoreConsul tests
+// TokenStoreRedis tests
 
-func getTokenStoreConsul() *service.TokenStoreConsul {
-	return service.NewTokenStoreConsul()
+func getTokenStoreRedis() *service.TokenStoreRedis {
+	return service.NewTokenStoreRedis()
 }
 
-func TestTokenStoreConsulFindByValue(t *testing.T) {
-	testTokenStoreFindByValue(getTokenStoreConsul())(t)
+func TestTokenStoreRedisFindByValue(t *testing.T) {
+	testTokenStoreFindByValue(getTokenStoreRedis())(t)
 }
 
-func TestTokenStoreConsulFindByLabel(t *testing.T) {
-	testTokenStoreFindByLabel(getTokenStoreConsul())(t)
+func TestTokenStoreRedisFindByLabel(t *testing.T) {
+	testTokenStoreFindByLabel(getTokenStoreRedis())(t)
 }
 
-func TestTokenStoreConsulRemove(t *testing.T) {
-	testTokenStoreRemove(getTokenStoreConsul())(t)
+func TestTokenStoreRedisRemove(t *testing.T) {
+	testTokenStoreRemove(getTokenStoreRedis())(t)
 }
 
-func TestTokenStoreConsulSave(t *testing.T) {
-	testTokenStoreSave(getTokenStoreConsul())(t)
+func TestTokenStoreRedisSave(t *testing.T) {
+	testTokenStoreSave(getTokenStoreRedis())(t)
 }
 
 // TokenUseCaseV1 tests
@@ -220,13 +220,13 @@ func getTokenUseCaseV1(s service.TokenStore) *service.TokenUseCaseV1 {
 }
 
 func TestTokenUseCaseV1GenerateToken(t *testing.T) {
-	testTokenUseCaseGenerateToken(getTokenUseCaseV1(getTokenStoreConsul()))(t)
+	testTokenUseCaseGenerateToken(getTokenUseCaseV1(getTokenStoreRedis()))(t)
 }
 
 func TestTokenUseCaseV1ValidateToken(t *testing.T) {
-	testTokenUseCaseValidateToken(getTokenUseCaseV1(getTokenStoreConsul()))(t)
+	testTokenUseCaseValidateToken(getTokenUseCaseV1(getTokenStoreRedis()))(t)
 }
 
 func TestTokenUseCaseV1RemoveToken(t *testing.T) {
-	testTokenUseCaseRemoveToken(getTokenUseCaseV1(getTokenStoreConsul()))(t)
+	testTokenUseCaseRemoveToken(getTokenUseCaseV1(getTokenStoreRedis()))(t)
 }

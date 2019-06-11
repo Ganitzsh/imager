@@ -29,13 +29,55 @@ Simply `go get` the repository:
 
 You can build the project, but you need to have `protoc` installed
 
+### Configuration
+
+Here is an example of configuration using a file:
+
+```yaml
+dev_mode: false
+
+# Human readable size (MB or mib supported). Supported units are:
+# "B", "kB", "MB", "GB", "TB", "PB", "EB", "B", "KiB", "MiB", "GiB", "TiB",
+# "PiB", "EiB"
+max_image_size: '12 MiB'
+buffer_size: 512
+
+# Main RPC Server
+host: 'localhost'
+port: 8080
+
+# HTTP Server configuration
+http:
+  enabled: false
+  port: 8888
+
+store:
+  type: 'redis'
+  redis:
+    host: '127.0.0.1:6379'
+    db: 0
+
+tls:
+  enabled: false
+  cert: 'cert.pem'
+  key: 'private.key'
+```
+
 ## General error codes
 
 The API returns the following error codes:
 
-| Code      | Description                           |
-| --------- | ------------------------------------- |
-| some_code | What it means and what could cause it |
+| Code                      | Description                                           |
+| ------------------------- | ----------------------------------------------------- |
+| `unknown_store_type`      | The specified store type is not supported             |
+| `resource_not_found`      | Whenever a resource is not found                      |
+| `resource_already_exists` | The resource attempted to be created already exists   |
+| `token_invalid`           | The given token cannot be verified or found           |
+| `token_expired`           | The given token has expired                           |
+| `config_invalid_tls`      | Something is wrong with the TLS configuration         |
+| `file_size_exceeded`      | The file is bigger than what the configuration allows |
+| `unsupported_format`      | Unsupported image format                              |
+| `internal_error`          |                                                       |
 
 ## Server mode
 
@@ -87,9 +129,15 @@ them are prefixed by `/api/v1`.
 
 ##### HTTP-Specific error codes
 
-| Code      | Description                           |
-| --------- | ------------------------------------- |
-| some_code | What it means and what could cause it |
+internal_error
+invalid_content_type
+invalid_input
+
+| Code                   | Description                                        |
+| ---------------------- | -------------------------------------------------- |
+| `internal_error`       | Something went wrong internally. User not in cause |
+| `invalid_content_type` | Unexpected Content-Type for the request            |
+| `invalid_input`        | Some fields in the request are incorrect           |
 
 #### Rotate
 

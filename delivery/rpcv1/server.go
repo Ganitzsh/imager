@@ -73,7 +73,7 @@ func (s *RPCServer) TransformImage(stream pb.IMage_TransformImageServer) error {
 			logrus.Errorf("failed to receive stream: %v", err)
 			return err
 		}
-		if req.GetImage().GetSize() > s.MaxImageSize {
+		if req.GetImage().GetSize() > int64(s.MaxImageSize) {
 			return service.ErrFileSizeExceeded
 		}
 		if fileSize == 0 {

@@ -1,13 +1,17 @@
 module github.com/ganitzsh/12fact
 
 require (
-	github.com/bxcodec/faker v2.0.1+incompatible
+	github.com/bxcodec/faker v2.0.1+incompatible // indirect
+	github.com/bxcodec/faker/v3 v3.1.0
+	github.com/davecgh/go-spew v1.1.1
 	github.com/disintegration/imaging v1.6.0
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.4.0
+	github.com/go-redis/redis v6.15.2+incompatible
 	github.com/golang/protobuf v1.3.1
 	github.com/google/uuid v1.1.1
-	github.com/hashicorp/consul/api v1.1.0
+	github.com/hashicorp/consul/api v1.1.0 // indirect
+	github.com/itsjamie/gin-cors v0.0.0-20160420130702-97b4a9da7933
 	github.com/mattn/go-isatty v0.0.8 // indirect
 	github.com/sirupsen/logrus v1.2.0
 	github.com/spf13/cobra v0.0.4

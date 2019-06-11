@@ -21,6 +21,10 @@ func (e ServiceError) Error() string {
 }
 
 var (
+	ErrUnknownStoreType = NewServiceError(
+		"unknown_store_type",
+		"The given store type is not recognized. You can use 'redis'",
+	)
 	ErrResourceNotFound = NewServiceError(
 		"resource_not_found",
 		"The given resource could not be found",

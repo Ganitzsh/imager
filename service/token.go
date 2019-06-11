@@ -1,10 +1,11 @@
 package service
 
 import (
+	"errors"
 	"time"
 
+	"github.com/go-redis/redis"
 	"github.com/google/uuid"
-	"github.com/hashicorp/consul/api"
 )
 
 type Token struct {
@@ -58,28 +59,34 @@ type TokenUseCase interface {
 	RemoveToken(t *Token) error
 }
 
-// TokenStoreConsul is an implemetation of the TokenStore backed by the
-// key-value store Consul
-type TokenStoreConsul struct {
-	*api.KV
+// TokenStoreRedis is an implemetation of the TokenStore backed by the
+// key-value store Redis
+type TokenStoreRedis struct {
+	*redis.Client
 }
 
-func NewTokenStoreConsul() *TokenStoreConsul {
-	return &TokenStoreConsul{}
+func NewTokenStoreRedis(c *redis.Client) (*TokenStoreRedis, error) {
+	if c == nil {
+		return nil, errors.New("Invalid redis client")
+	}
+	if err := c.Ping().Err(); err != nil {
+		return nil, err
+	}
+	return &TokenStoreRedis{c}, nil
 }
 
-func (s *TokenStoreConsul) FindByValue(value uuid.UUID) (*Token, error) {
+func (s *TokenStoreRedis) FindByValue(value uuid.UUID) (*Token, error) {
 	return nil, nil
 }
 
-func (s *TokenStoreConsul) FindByLabel(value string) (*Token, error) {
+func (s *TokenStoreRedis) FindByLabel(value string) (*Token, error) {
 	return nil, nil
 }
 
-func (s *TokenStoreConsul) Remove(value uuid.UUID) error {
+func (s *TokenStoreRedis) Remove(value uuid.UUID) error {
 	return nil
 }
 
-func (s *TokenStoreConsul) Save(t *Token) (*Token, error) {
+func (s *TokenStoreRedis) Save(t *Token) (*Token, error) {
 	return nil, nil
 }
