@@ -1,0 +1,27 @@
+dev_mode: false
+
+# Human readable size (MB or mib supported). Supported units are:
+# "B", "kB", "MB", "GB", "TB", "PB", "EB", "B", "KiB", "MiB", "GiB", "TiB",
+# "PiB", "EiB"
+max_image_size: '12 MiB'
+buffer_size: 512
+
+# Main RPC Server
+host: 'localhost'
+port: 8080
+
+# HTTP Server configuration
+http:
+  enabled: false
+  port: 8888
+
+store:
+  type: 'redis'
+  redis:
+    host: '127.0.0.1:6379'
+    db: 0
+
+tls:
+  enabled: false
+  cert: 'cert.pem'
+  key: 'private.key'

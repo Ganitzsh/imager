@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transformer-deployment
+  labels:
+    app: transformer
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: transformer
+  template:
+    metadata:
+      labels:
+        app: transformer
+    spec:
+      containers:
+        - name: transformer-app
+          image: ganich/transformer
+          imagePullPolicy: Always
+          ports:
+            - name: rpc-port
+              containerPort: 8080
+            - name: http-port
+              containerPort: 8081
+          env:
+            - name: API.STORE.TYPE
+              value: redis
+            - name: API.DEV.MODE
+              value: 'false'
+            - name: API.HTTP.ENABLED
+              value: 'true'

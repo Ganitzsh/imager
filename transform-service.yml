@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: transformer-service
+spec:
+  ports:
+    - port: 8080
+      name: rcp
+      targetPort: rpc-port
+      protocol: TCP
+    - port: 8081
+      name: http
+      targetPort: http-port
+      protocol: TCP
+  selector:
+    app: transformer
+  type: NodePort
