@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/bxcodec/faker"
+	"github.com/bxcodec/faker/v3"
 	"github.com/ganitzsh/12fact/service"
 	"github.com/stretchr/testify/require"
 )
