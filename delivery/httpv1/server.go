@@ -1,6 +1,7 @@
 package httpv1
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -15,6 +16,7 @@ const (
 
 type HTTPServerV1 struct {
 	Image *ImageHandler
+	service.TokenUseCase
 	*service.Config
 }
 
@@ -28,8 +30,20 @@ func NewHTTPServerV1(cfg *service.Config) *HTTPServerV1 {
 	}
 }
 
+func (s *HTTPServerV1) SetTokenUseCase(
+	value service.TokenUseCase,
+) *HTTPServerV1 {
+	s.TokenUseCase = value
+	return s
+}
+
 func (s *HTTPServerV1) ListenAndServe() error {
 	var err error
+
+	if s.TokenUseCase == nil {
+		return errors.New("No token use case")
+	}
+
 	addr := fmt.Sprintf("%s:%d", s.Host, s.HTTPPort)
 	logrus.Infof("Starting HTTP Server on port %d", s.HTTPPort)
 	if s.TLSEnabled {

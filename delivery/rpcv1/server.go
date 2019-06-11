@@ -1,6 +1,8 @@
 package rpcv1
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -20,6 +22,7 @@ import (
 
 type RPCServer struct {
 	*service.Config
+	service.TokenUseCase
 }
 
 func NewRPCServer(cfg *service.Config) *RPCServer {
@@ -28,7 +31,15 @@ func NewRPCServer(cfg *service.Config) *RPCServer {
 	}
 }
 
+func (s *RPCServer) SetTokenUseCase(value service.TokenUseCase) *RPCServer {
+	s.TokenUseCase = value
+	return s
+}
+
 func (s *RPCServer) ListenAndServe() error {
+	if s.TokenUseCase == nil {
+		return errors.New("No token use case")
+	}
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", s.Host, s.Port))
 	if err != nil {
 		return err
@@ -139,4 +150,19 @@ func (s *RPCServer) TransformImage(stream pb.IMage_TransformImageServer) error {
 		}
 	}
 	return nil
+}
+
+func (s *RPCServer) Healthcheck(
+	ctx context.Context,
+	req *pb.HealthcheckRequest,
+) (*pb.HealthcheckStatus, error) {
+	var storeUp bool
+	if s.TokenUseCase == nil || s.TokenUseCase.GetTokenStore() == nil {
+		storeUp = false
+	} else {
+		storeUp = s.TokenUseCase.GetTokenStore().Up()
+	}
+	return &pb.HealthcheckStatus{
+		Store: storeUp,
+	}, nil
 }

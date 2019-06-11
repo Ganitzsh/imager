@@ -42,15 +42,21 @@ var rootCmd = &cobra.Command{
 			logrus.Error(err)
 			os.Exit(1)
 		}
-		spew.Dump(cfg)
 		if cfg.DevMode {
+			spew.Dump(cfg)
 			logrus.SetLevel(logrus.DebugLevel)
 		}
-		if cfg.HTTPEnabled {
-			go httpv1.NewHTTPServerV1(cfg).ListenAndServe()
-		}
-		if err := rpcv1.NewRPCServer(cfg).ListenAndServe(); err != nil {
+		ts, err := service.GetTokenStore(cfg)
+		if err != nil {
 			logrus.Error(err)
+			os.Exit(1)
+		}
+		tuc := service.NewTokenUseCaseV1(ts)
+		if cfg.HTTPEnabled {
+			go httpv1.NewHTTPServerV1(cfg).SetTokenUseCase(tuc).ListenAndServe()
+		}
+		if err := rpcv1.NewRPCServer(cfg).SetTokenUseCase(tuc).ListenAndServe(); err != nil {
+			logrus.Errorf("Failed to start RPC server: %v", err)
 			os.Exit(1)
 		}
 	},

@@ -18,6 +18,10 @@ func (uc *TokenUseCaseV1) SetValidity(value time.Duration) *TokenUseCaseV1 {
 	return uc
 }
 
+func (uc *TokenUseCaseV1) GetTokenStore() TokenStore {
+	return uc.TokenStore
+}
+
 func (uc *TokenUseCaseV1) GenerateToken(label string) (t *Token, err error) {
 	t, err = uc.FindByLabel(label)
 	if err == nil {

@@ -8,30 +8,30 @@ import (
 	trans "github.com/ganitzsh/12fact/service"
 )
 
-func main() {
-	image := "./image.png"
+func do() error {
+	image := "./img.png"
 	ext := filepath.Ext(image)
 	f, err := os.Open(image)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	// You can now start applying transformations
 	rotation := trans.NewRotate().SetAngle(90).SetClockWise(true)
 	ret, err := trans.SingleTransformImage(f, ext, rotation)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	blur := trans.NewBlur().SetSigma(4.5)
 	ret, err = trans.SingleTransformImage(ret, ext, blur)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	out, err := os.Create("./out.png")
 	if err != nil {
-		panic(err)
+		return err
 	}
 	defer out.Close()
 
@@ -50,16 +50,23 @@ func main() {
 	f.Seek(0, 0)
 	ret2, err := trans.TransformImage(f, ext, transformations)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	out2, err := os.Create("./out2.png")
 	if err != nil {
-		panic(err)
+		return err
 	}
 	defer out2.Close()
 
 	if _, err := io.Copy(out2, ret2); err != nil {
+		return err
+	}
+	return nil
+}
+
+func main() {
+	if err := do(); err != nil {
 		panic(err)
 	}
 }

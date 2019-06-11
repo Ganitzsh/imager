@@ -45,9 +45,8 @@ const (
 
 type RedisConfig struct {
 	Host     string
-	User     string
 	Password string
-	DB       uint32
+	DB       int
 }
 
 type StoreConfig struct {
@@ -105,9 +104,8 @@ func NewConfig() (*Config, error) {
 			Type: StoreType(viper.GetString("store.type")),
 			Redis: &RedisConfig{
 				Host:     viper.GetString("store.redis.host"),
-				User:     viper.GetString("store.redis.user"),
 				Password: viper.GetString("store.redis.password"),
-				DB:       viper.GetUint32("store.redis.db"),
+				DB:       viper.GetInt("store.redis.db"),
 			},
 		},
 	}

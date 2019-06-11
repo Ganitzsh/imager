@@ -49,6 +49,7 @@ type TokenStore interface {
 	FindByLabel(label string) (*Token, error)
 	Remove(value uuid.UUID) error
 	Save(t *Token) (*Token, error)
+	Up() bool
 }
 
 // TokenUseCase is definition of the different actions possible regarding auth
@@ -57,6 +58,7 @@ type TokenUseCase interface {
 	GenerateToken(label string) (*Token, error)
 	ValidateToken(t *Token) error
 	RemoveToken(t *Token) error
+	GetTokenStore() TokenStore
 }
 
 // TokenStoreRedis is an implemetation of the TokenStore backed by the
@@ -69,24 +71,83 @@ func NewTokenStoreRedis(c *redis.Client) (*TokenStoreRedis, error) {
 	if c == nil {
 		return nil, errors.New("Invalid redis client")
 	}
-	if err := c.Ping().Err(); err != nil {
-		return nil, err
-	}
 	return &TokenStoreRedis{c}, nil
 }
 
 func (s *TokenStoreRedis) FindByValue(value uuid.UUID) (*Token, error) {
-	return nil, nil
+	cmd := s.Get(value.String())
+	if err := cmd.Err(); err != nil {
+		return nil, ErrResourceNotFound
+	}
+	label, err := cmd.Result()
+	if err != nil {
+		return nil, err
+	}
+	return &Token{
+		Label: label,
+		Value: value,
+	}, nil
 }
 
-func (s *TokenStoreRedis) FindByLabel(value string) (*Token, error) {
-	return nil, nil
+func (s *TokenStoreRedis) FindByLabel(label string) (*Token, error) {
+	cmd := s.Get(label)
+	if e := cmd.Err(); e != nil {
+		return nil, ErrResourceNotFound
+	}
+	vStr, err := cmd.Result()
+	if err != nil {
+		return nil, err
+	}
+	v, err := uuid.Parse(vStr)
+	if err != nil {
+		return nil, err
+	}
+	return &Token{
+		Label: label,
+		Value: v,
+	}, nil
 }
 
 func (s *TokenStoreRedis) Remove(value uuid.UUID) error {
+	cmd := s.Get(value.String())
+	if err := cmd.Err(); err != nil {
+		return err
+	}
+	label, err := cmd.Result()
+	if err != nil {
+		return err
+	}
+	if err := s.Del(value.String()).Err(); err != nil {
+		return err
+	}
+	if err := s.Del(label).Err(); err != nil {
+		return err
+	}
 	return nil
 }
 
 func (s *TokenStoreRedis) Save(t *Token) (*Token, error) {
-	return nil, nil
+	if t == nil {
+		return nil, ErrInternalError
+	}
+	if t.Label == "" {
+		return nil, ErrInvalidInput
+	}
+	if err := s.Set(t.Label, t.Value.String(), t.ValidFor).Err(); err != nil {
+		return nil, err
+	}
+	if err := s.Set(t.Value.String(), t.Label, t.ValidFor).Err(); err != nil {
+		return nil, err
+	}
+	return t, nil
+}
+
+func (s *TokenStoreRedis) Up() bool {
+	if s.Client == nil {
+		return false
+	}
+	if err := s.Ping().Err(); err != nil {
+		return false
+	}
+	return true
 }

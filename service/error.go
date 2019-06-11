@@ -21,6 +21,14 @@ func (e ServiceError) Error() string {
 }
 
 var (
+	ErrInvalidInput = NewServiceError(
+		"invalid_input",
+		"Invalid input",
+	)
+	ErrInvalidConfig = NewServiceError(
+		"invalid_configuration",
+		"Invalid configuration, check again",
+	)
 	ErrUnknownStoreType = NewServiceError(
 		"unknown_store_type",
 		"The given store type is not recognized. You can use 'redis'",

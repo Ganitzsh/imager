@@ -9,6 +9,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func init() {
+	service.InitConfig()
+}
+
 // Test cases definition
 
 func testTokenStoreFindByValue(s service.TokenStore) func(t *testing.T) {
@@ -22,22 +26,22 @@ func testTokenStoreFindByValue(s service.TokenStore) func(t *testing.T) {
 			SetValidFor(48 * time.Hour).SetLabel(faker.Password())
 
 		t1, err = s.Save(t1)
+		require.NoError(t, err)
 		require.NotNil(t, t1)
-		require.NoError(t, err)
 		t2, err = s.Save(t2)
-		require.NotNil(t, t2)
 		require.NoError(t, err)
+		require.NotNil(t, t2)
 
 		t1Ret, err := s.FindByValue(t1.Value)
-		require.NotNil(t, t1Ret)
 		require.NoError(t, err)
+		require.NotNil(t, t1Ret)
 		require.Equal(t, t1.Label, t1Ret.Label)
 		require.Equal(t, t1.Value, t1Ret.Value)
 		require.Equal(t, t1.ValidFor, 24*time.Hour)
 
 		t2Ret, err := s.FindByValue(t2.Value)
-		require.NotNil(t, t2Ret)
 		require.NoError(t, err)
+		require.NotNil(t, t2Ret)
 		require.Equal(t, t2.Label, t2Ret.Label)
 		require.Equal(t, t2.Value, t2Ret.Value)
 		require.Equal(t, t2.ValidFor, 48*time.Hour)
@@ -55,22 +59,22 @@ func testTokenStoreFindByLabel(s service.TokenStore) func(t *testing.T) {
 			SetValidFor(48 * time.Hour).SetLabel(faker.Password())
 
 		t1, err = s.Save(t1)
+		require.NoError(t, err)
 		require.NotNil(t, t1)
-		require.NoError(t, err)
 		t2, err = s.Save(t2)
-		require.NotNil(t, t2)
 		require.NoError(t, err)
+		require.NotNil(t, t2)
 
 		t1Ret, err := s.FindByLabel(t1.Label)
-		require.NotNil(t, t1Ret)
 		require.NoError(t, err)
+		require.NotNil(t, t1Ret)
 		require.Equal(t, t1.Label, t1Ret.Label)
 		require.Equal(t, t1.Value, t1Ret.Value)
 		require.Equal(t, t1.ValidFor, 24*time.Hour)
 
 		t2Ret, err := s.FindByLabel(t2.Label)
-		require.NotNil(t, t2Ret)
 		require.NoError(t, err)
+		require.NotNil(t, t2Ret)
 		require.Equal(t, t2.Label, t2Ret.Label)
 		require.Equal(t, t2.Value, t2Ret.Value)
 		require.Equal(t, t2.ValidFor, 48*time.Hour)
@@ -88,15 +92,15 @@ func testTokenStoreRemove(s service.TokenStore) func(t *testing.T) {
 			SetValidFor(48 * time.Hour).SetLabel(faker.Password())
 
 		t1, err = s.Save(t1)
+		require.NoError(t, err)
 		require.NotNil(t, t1)
-		require.NoError(t, err)
 		t2, err = s.Save(t2)
-		require.NotNil(t, t2)
 		require.NoError(t, err)
+		require.NotNil(t, t2)
 
 		t1Ret, err := s.FindByLabel(t1.Label)
-		require.NotNil(t, t1Ret)
 		require.NoError(t, err)
+		require.NotNil(t, t1Ret)
 		require.Equal(t, t1.Label, t1Ret.Label)
 		require.Equal(t, t1.Value, t1Ret.Value)
 		require.Equal(t, t1.ValidFor, 24*time.Hour)
@@ -107,8 +111,8 @@ func testTokenStoreRemove(s service.TokenStore) func(t *testing.T) {
 		require.Equal(t, service.ErrResourceNotFound, err)
 
 		t2Ret, err := s.FindByLabel(t2.Label)
-		require.NotNil(t, t2Ret)
 		require.NoError(t, err)
+		require.NotNil(t, t2Ret)
 		require.Equal(t, t2.Label, t2Ret.Label)
 		require.Equal(t, t2.Value, t2Ret.Value)
 		require.Equal(t, t2.ValidFor, 48*time.Hour)
@@ -193,28 +197,30 @@ func testTokenUseCaseRemoveToken(
 
 // TokenStoreRedis tests
 
-func getTokenStoreRedis() *service.TokenStoreRedis {
-	s, err := service.NewTokenStoreRedis(nil)
+func getTokenStoreRedis(t *testing.T) *service.TokenStoreRedis {
+	cfg, _ := service.NewConfig()
+	cfg.Store.Type = service.StoreTypeRedis
+	s, err := service.GetTokenStore(cfg)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
-	return s
+	return s.(*service.TokenStoreRedis)
 }
 
 func TestTokenStoreRedisFindByValue(t *testing.T) {
-	testTokenStoreFindByValue(getTokenStoreRedis())(t)
+	testTokenStoreFindByValue(getTokenStoreRedis(t))(t)
 }
 
 func TestTokenStoreRedisFindByLabel(t *testing.T) {
-	testTokenStoreFindByLabel(getTokenStoreRedis())(t)
+	testTokenStoreFindByLabel(getTokenStoreRedis(t))(t)
 }
 
 func TestTokenStoreRedisRemove(t *testing.T) {
-	testTokenStoreRemove(getTokenStoreRedis())(t)
+	testTokenStoreRemove(getTokenStoreRedis(t))(t)
 }
 
 func TestTokenStoreRedisSave(t *testing.T) {
-	testTokenStoreSave(getTokenStoreRedis())(t)
+	testTokenStoreSave(getTokenStoreRedis(t))(t)
 }
 
 // TokenUseCaseV1 tests
@@ -224,13 +230,13 @@ func getTokenUseCaseV1(s service.TokenStore) *service.TokenUseCaseV1 {
 }
 
 func TestTokenUseCaseV1GenerateToken(t *testing.T) {
-	testTokenUseCaseGenerateToken(getTokenUseCaseV1(getTokenStoreRedis()))(t)
+	testTokenUseCaseGenerateToken(getTokenUseCaseV1(getTokenStoreRedis(t)))(t)
 }
 
 func TestTokenUseCaseV1ValidateToken(t *testing.T) {
-	testTokenUseCaseValidateToken(getTokenUseCaseV1(getTokenStoreRedis()))(t)
+	testTokenUseCaseValidateToken(getTokenUseCaseV1(getTokenStoreRedis(t)))(t)
 }
 
 func TestTokenUseCaseV1RemoveToken(t *testing.T) {
-	testTokenUseCaseRemoveToken(getTokenUseCaseV1(getTokenStoreRedis()))(t)
+	testTokenUseCaseRemoveToken(getTokenUseCaseV1(getTokenStoreRedis(t)))(t)
 }
