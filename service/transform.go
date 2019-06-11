@@ -2,6 +2,7 @@ package service
 
 import (
 	"bytes"
+	"errors"
 	"image"
 	"io"
 	"sync"
@@ -63,9 +64,11 @@ func TransformImage(
 		return nil, err
 	}
 	for _, t := range transformations {
-		t.Log()
-		if err := t.Do(img).Err(); err != nil {
-			return nil, err
+		if t != nil {
+			t.Log()
+			if err := t.Do(img).Err(); err != nil {
+				return nil, err
+			}
 		}
 	}
 	return imageBuffer(img.Image, img.Format)
@@ -75,6 +78,9 @@ func SingleTransformImage(
 	f io.Reader, ext string,
 	transformation Transformation,
 ) (io.Reader, error) {
+	if transformation == nil {
+		return nil, errors.New("Invalid transformation")
+	}
 	return TransformImage(f, ext, []Transformation{transformation})
 }
 
