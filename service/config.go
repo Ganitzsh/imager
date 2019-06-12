@@ -65,6 +65,8 @@ type HTTPConfig struct {
 type Config struct {
 	DevMode bool
 
+	Token string
+
 	TLSEnabled bool
 	TLSCert    string
 	TLSKey     string
@@ -90,6 +92,8 @@ func NewConfig() (*Config, error) {
 	}
 	c := Config{
 		DevMode: viper.GetBool("dev_mode"),
+
+		Token: viper.GetString("token"),
 
 		Host:         viper.GetString("host"),
 		Port:         viper.GetInt32("port"),
