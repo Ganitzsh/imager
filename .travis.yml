@@ -7,6 +7,8 @@ matrix:
     - go: "1.12.x"
       env: GO111MODULE=on
     - go: tip
+  install:
+    - go get github.com/ganitzsh/12fact/cmd
   script:
     - ./.travis.gofmt.sh
     - go test -v ./...
