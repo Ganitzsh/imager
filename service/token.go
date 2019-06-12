@@ -50,6 +50,7 @@ type TokenStore interface {
 	Remove(value uuid.UUID) error
 	Save(t *Token) (*Token, error)
 	Up() bool
+	RootToken() *Token
 }
 
 // TokenUseCase is definition of the different actions possible regarding auth
@@ -72,6 +73,10 @@ func NewTokenStoreRedis(c *redis.Client) (*TokenStoreRedis, error) {
 		return nil, errors.New("Invalid redis client")
 	}
 	return &TokenStoreRedis{c}, nil
+}
+
+func (TokenStoreRedis) RootToken() *Token {
+	return NewToken().SetLabel("transformer.root.token")
 }
 
 func (s *TokenStoreRedis) FindByValue(value uuid.UUID) (*Token, error) {
@@ -132,6 +137,9 @@ func (s *TokenStoreRedis) Save(t *Token) (*Token, error) {
 	}
 	if t.Label == "" {
 		return nil, ErrInvalidInput
+	}
+	if _, err := s.FindByLabel(t.Label); err == nil {
+		return nil, ErrResourceAlreadyExists
 	}
 	if err := s.Set(t.Label, t.Value.String(), t.ValidFor).Err(); err != nil {
 		return nil, err
