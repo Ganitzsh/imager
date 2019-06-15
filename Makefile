@@ -1,4 +1,4 @@
-NAME	=	12fact
+NAME	=	imager
 
 all:
 	go build -o ${NAME}
