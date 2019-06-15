@@ -139,3 +139,30 @@ func (h *ImageHandler) Crop(c *gin.Context) {
 	}
 	writeImage(c, f, ct)
 }
+
+type ResizePayload struct {
+	Width  int `form:"width"`
+	Height int `form:"height"`
+}
+
+func (h *ImageHandler) Resize(c *gin.Context) {
+	p := ResizePayload{}
+	if err := c.ShouldBind(&p); err != nil {
+		c.Error(ErrInvalidInput)
+		return
+	}
+	file, ct, ext, err := extractFormFile(c, "file")
+	if err != nil {
+		c.Error(err)
+		return
+	}
+	f, err := service.SingleTransformImage(file, ext, &service.Resize{
+		Width:  p.Width,
+		Height: p.Height,
+	})
+	if err != nil {
+		c.Error(err)
+		return
+	}
+	writeImage(c, f, ct)
+}

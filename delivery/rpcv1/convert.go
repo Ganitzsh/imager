@@ -19,6 +19,9 @@ var requestFactory = map[pb.TransformationType]func() proto.Message{
 	pb.TransformationType_CROP: func() proto.Message {
 		return &pb.CropImageRequest{}
 	},
+	pb.TransformationType_RESIZE: func() proto.Message {
+		return &pb.ResizeImageRequest{}
+	},
 }
 
 func (s *RPCServer) makeMessage(typ pb.TransformationType) proto.Message {
@@ -50,6 +53,10 @@ func (s *RPCServer) ToTransfomation(req proto.Message) service.Transformation {
 			SetTopLeftY(int(req.(*pb.CropImageRequest).GetTopLeftY())).
 			SetWidth(int(req.(*pb.CropImageRequest).GetWidth())).
 			SetHeight(int(req.(*pb.CropImageRequest).GetHeight()))
+	case *pb.ResizeImageRequest:
+		return service.NewResize().
+			SetWidth(int(req.(*pb.ResizeImageRequest).GetWidth())).
+			SetHeight(int(req.(*pb.ResizeImageRequest).GetHeight()))
 	default:
 		return nil
 	}

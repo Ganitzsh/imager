@@ -43,4 +43,14 @@ func TestToTransformation(t *testing.T) {
 		Width:    450,
 		Height:   900,
 	}, transformedCrop)
+	resize := &pb.ResizeImageRequest{
+		Width:  450,
+		Height: 900,
+	}
+	transformedResize := s.ToTransfomation(resize)
+	require.NotNil(t, transformedResize)
+	require.EqualValues(t, &service.Resize{
+		Width:  450,
+		Height: 900,
+	}, transformedResize)
 }

@@ -39,6 +39,7 @@ enum TransformationType {
   ROTATE = 0;
   CROP = 1;
   BLUR = 2;
+  RESIZE = 3;
 }
 
 message TransformImageRequest {
@@ -54,6 +55,11 @@ message RotateImageRequest {
 
 message BlurImageRequest {
   float sigma = 1;
+}
+
+message ResizeImageRequest {
+  int32 width = 1;
+  int32 height = 2;
 }
 
 message CropImageRequest {
