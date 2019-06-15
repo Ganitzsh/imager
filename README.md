@@ -1,6 +1,7 @@
-# 12fact
+# Imager
 
-Simple app demonstrating the 12Factor app principles (<https://12factor.net/>)
+Imager is a service written in Go that makes manipulating images easy.
+Run it or use it as a library. It just works.
 
 This service allows you to manipulate images and apply the following
 transformations:
@@ -23,7 +24,7 @@ Supported formats:
 
 Simply `go get` the repository:
 
-    go get -u github.com/ganitzsh/12fact
+    go get -u github.com/ganitzsh/imager
 
 ### Building
 

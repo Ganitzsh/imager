@@ -42,12 +42,16 @@ var rootCmd = &cobra.Command{
 			logrus.Error(err)
 			os.Exit(1)
 		}
-		spew.Dump(cfg)
 		if cfg.DevMode {
+			spew.Dump(cfg)
 			logrus.SetLevel(logrus.DebugLevel)
 		}
 		ts, err := service.GetTokenStore(cfg)
 		if err != nil {
+			logrus.Error(err)
+			os.Exit(1)
+		}
+		if _, err := service.InitRootToken(ts); err != nil {
 			logrus.Error(err)
 			os.Exit(1)
 		}

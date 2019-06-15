@@ -166,3 +166,10 @@ func (s *RPCServer) Healthcheck(
 		Store: storeUp,
 	}, nil
 }
+
+func (s *RPCServer) GetNewToken(
+	ctx context.Context,
+	req *pb.NewTokenRquest,
+) (*pb.NewTokenResponse, error) {
+	return nil, nil
+}

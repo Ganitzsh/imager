@@ -6,6 +6,7 @@ import (
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/ganitzsh/12fact/service"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
 
@@ -135,36 +136,40 @@ func testTokenStoreSave(s service.TokenStore) func(t *testing.T) {
 			SetValidFor(48 * time.Hour).SetLabel(faker.Password())
 
 		t1, err = s.Save(t1)
+		require.NoError(t, err)
 		require.NotNil(t, t1)
-		require.NoError(t, err)
+		_, err = s.Save(t1)
+		require.Equal(t, service.ErrResourceAlreadyExists, err)
 		t2, err = s.Save(t2)
-		require.NotNil(t, t2)
 		require.NoError(t, err)
+		require.NotNil(t, t2)
+		_, err = s.Save(t2)
+		require.Equal(t, service.ErrResourceAlreadyExists, err)
 
 		t1Ret, err := s.FindByLabel(t1.Label)
-		require.NotNil(t, t1Ret)
 		require.NoError(t, err)
+		require.NotNil(t, t1Ret)
 		require.Equal(t, t1.Label, t1Ret.Label)
 		require.Equal(t, t1.Value, t1Ret.Value)
 		require.Equal(t, t1.ValidFor, 24*time.Hour)
 
 		t1Ret, err = s.FindByValue(t1.Value)
-		require.NotNil(t, t1Ret)
 		require.NoError(t, err)
+		require.NotNil(t, t1Ret)
 		require.Equal(t, t1.Label, t1Ret.Label)
 		require.Equal(t, t1.Value, t1Ret.Value)
 		require.Equal(t, t1.ValidFor, 24*time.Hour)
 
 		t2Ret, err := s.FindByLabel(t2.Label)
-		require.NotNil(t, t2Ret)
 		require.NoError(t, err)
+		require.NotNil(t, t2Ret)
 		require.Equal(t, t2.Label, t2Ret.Label)
 		require.Equal(t, t2.Value, t2Ret.Value)
 		require.Equal(t, t2.ValidFor, 48*time.Hour)
 
 		t2Ret, err = s.FindByValue(t2.Value)
-		require.NotNil(t, t2Ret)
 		require.NoError(t, err)
+		require.NotNil(t, t2Ret)
 		require.Equal(t, t2.Label, t2Ret.Label)
 		require.Equal(t, t2.Value, t2Ret.Value)
 		require.Equal(t, t2.ValidFor, 48*time.Hour)
@@ -176,6 +181,18 @@ func testTokenUseCaseGenerateToken(
 ) func(t *testing.T) {
 	return func(t *testing.T) {
 		require.NotNilf(t, uc, "TokenUseCase is nil")
+
+		label := "test." + uuid.New().String()
+		t1, err := uc.GenerateToken(label)
+		require.NoError(t, err)
+		require.NotNil(t, t1)
+
+		t1Dup, err := uc.GenerateToken(label)
+		require.Error(t, err)
+		require.Nil(t, t1Dup)
+
+		_, err = uc.GenerateToken("")
+		require.Error(t, err)
 	}
 }
 
@@ -184,6 +201,18 @@ func testTokenUseCaseValidateToken(
 ) func(t *testing.T) {
 	return func(t *testing.T) {
 		require.NotNilf(t, uc, "TokenUseCase is nil")
+
+		label := "test." + uuid.New().String()
+		t1, err := uc.GenerateToken(label)
+		require.NoError(t, err)
+		require.NotNil(t, t1)
+
+		require.NoError(t, uc.ValidateToken(t1))
+
+		require.NoError(t, uc.ValidateToken(nil))
+
+		random := service.NewToken().SetLabel("random_label")
+		require.Error(t, uc.ValidateToken(random))
 	}
 }
 
@@ -192,6 +221,23 @@ func testTokenUseCaseRemoveToken(
 ) func(t *testing.T) {
 	return func(t *testing.T) {
 		require.NotNilf(t, uc, "TokenUseCase is nil")
+
+		label1 := "test." + uuid.New().String()
+		t1, err := uc.GenerateToken(label1)
+		require.NoError(t, err)
+		require.NotNil(t, t1)
+
+		label2 := "test." + uuid.New().String()
+		t2, err := uc.GenerateToken(label2)
+		require.NoError(t, err)
+		require.NotNil(t, t1)
+
+		require.NoError(t, uc.RemoveToken(t1))
+		require.NoError(t, uc.RemoveToken(t2))
+		require.Error(t, uc.RemoveToken(t1))
+		require.Error(t, uc.RemoveToken(t2))
+
+		require.NoError(t, uc.RemoveToken(nil))
 	}
 }
 

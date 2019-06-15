@@ -7,6 +7,16 @@ import "google/protobuf/any.proto";
 service IMage {
   rpc TransformImage(stream TransformImageRequest) returns (stream TransformedImage);
   rpc Healthcheck(HealthcheckRequest) returns (HealthcheckStatus);
+  rpc GetNewToken(NewTokenRquest) returns (NewTokenResponse);
+}
+
+message NewTokenResponse {
+  string label = 1;
+  string value = 2;
+}
+
+message NewTokenRquest {
+  string label = 1;
 }
 
 message HealthcheckRequest {}

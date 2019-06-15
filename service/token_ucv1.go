@@ -32,6 +32,9 @@ func (uc *TokenUseCaseV1) GenerateToken(label string) (t *Token, err error) {
 }
 
 func (uc *TokenUseCaseV1) ValidateToken(t *Token) (err error) {
+	if t == nil {
+		return nil
+	}
 	t, err = uc.FindByValue(t.Value)
 	if err != nil {
 		return err
@@ -40,5 +43,8 @@ func (uc *TokenUseCaseV1) ValidateToken(t *Token) (err error) {
 }
 
 func (uc *TokenUseCaseV1) RemoveToken(t *Token) error {
+	if t == nil {
+		return nil
+	}
 	return uc.Remove(t.Value)
 }
